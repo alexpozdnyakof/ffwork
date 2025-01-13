@@ -1,0 +1,12 @@
+{
+  "name": "fwork",
+  "version": "0.0.1",
+  "description": "simple frontend framework",
+  "main": "index.js",
+  "author": "alexpozdnyakof",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
+}
