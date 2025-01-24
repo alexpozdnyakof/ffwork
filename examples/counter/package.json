@@ -1,0 +1,19 @@
+{
+  "name": "counter",
+  "version": "0.0.1",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.4"
+  },
+  "dependencies": {
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "rollup": "^4.31.0",
+    "rollup-plugin-copy": "^3.5.0",
+    "runtime": "0.0.1"
+  },
+  "scripts": {
+    "start": "serve dist/",
+    "build": "rollup -c"
+  }
+}
