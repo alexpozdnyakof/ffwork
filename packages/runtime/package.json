@@ -2,7 +2,8 @@
   "name": "runtime",
   "version": "0.0.1",
   "description": "framework runtime core",
-  "main": "index.js",
+  "main": "dist/fwork.js",
+  "module": "dist/fwork.js",
   "author": "alexpozdnyakof",
   "license": "MIT",
   "devDependencies": {
