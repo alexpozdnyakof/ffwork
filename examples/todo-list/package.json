@@ -1,0 +1,21 @@
+{
+  "name": "todo-list",
+  "version": "0.0.1",
+  "description": "simple todo list using fwork",
+  "main": "index.js",
+  "author": "alexpozdnyakof",
+  "license": "MIT",
+  "dependencies": {
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "rollup": "^4.32.0",
+    "rollup-plugin-copy": "^3.5.0",
+    "runtime": "0.0.1"
+  },
+  "devDependencies": {
+    "serve": "^14.2.4"
+  },
+  "scripts": {
+    "start": "serve dist/",
+    "build": "rollup -c"
+  }
+}
