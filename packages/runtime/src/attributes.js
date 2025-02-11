@@ -42,11 +42,18 @@ function setClass(el, className) {
 
 
 export function setStyle(el, name, value) {
-  el.style[name] = value;
+  if (name.startsWith("--")) {
+    el.style.setProperty(name, value);
+  } else {
+    el.style[name] = value;
+  }
 }
 
 export function removeStyle(el, name) {
-  el.style[name] = null;
+  if(name.startsWith("--")) {
+    el.style.removeProperty(name);
+  } else {
+    el.style[name] = null;
+  }
 }
-
 
