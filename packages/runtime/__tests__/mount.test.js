@@ -1,10 +1,12 @@
 import { expect, test, beforeEach, vi } from "vitest";
 import { mount } from "../src/mount";
+import { unmount } from "../src/unmount";
 import { h, hString, hFragment } from "../src/h";
 
 beforeEach(() => {
   vi.unstubAllGlobals();
   document.body.innerHTML = "";
+  document.head.innerHTML = "";
 })
 
 test("should mount a text", () => {
@@ -57,6 +59,28 @@ test("should mount an element with style", () => {
   mount(node, document.body);
   expect(document.body.innerHTML).toBe(`<button style="font-weight: bold;">submit</button>`);
   expect(node.el.style.fontWeight).toBe("bold")
+})
+
+test("should change css custom property value", () => {
+  const css = ":root { --text-color: blue; }; .btn { color: var(--text-color) }; ";
+  const style = document.createElement("style");
+  document.head.appendChild(style);
+  style.type = "text/css";
+  style.appendChild(document.createTextNode(css));
+
+  let node = h("button", { class: "btn" }, [hString("submit")]);
+  mount(node, document.body);
+  let computedStyle = window.getComputedStyle(node.el);
+  expect(computedStyle.getPropertyValue("--text-color")).not.toBe("red");
+  
+  unmount(node);
+
+  node = h("button", { class: "btn", style: { "--text-color": "red" } }, [hString("submit")]);
+  mount(node, document.body);
+  computedStyle = window.getComputedStyle(node.el);
+  expect(computedStyle.getPropertyValue("--text-color")).toBe("red");
+  
+  unmount(node);
 })
 
 test("should attach event listener to mounted element", () => {
