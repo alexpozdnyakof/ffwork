@@ -4,12 +4,12 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
-    "serve": "^14.2.4"
-  },
-  "dependencies": {
     "@rollup/plugin-node-resolve": "^16.0.0",
     "rollup": "^4.31.0",
     "rollup-plugin-copy": "^3.5.0",
+    "serve": "^14.2.4"
+  },
+  "dependencies": {
     "runtime": "0.0.1"
   },
   "scripts": {
