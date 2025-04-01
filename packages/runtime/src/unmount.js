@@ -1,10 +1,10 @@
 import { DOM_TYPES } from "./h";
 import { removeEventListeners } from "./events";
 
-export function unmount(vdom){
+export function unmount(vdom) {
   const { type } = vdom;
 
-  switch(type) {
+  switch (type) {
     case DOM_TYPES.TEXT: {
       removeTextNode(vdom);
       break;
@@ -17,7 +17,8 @@ export function unmount(vdom){
       removeFragmentNode(vdom);
       break;
     }
-    default: throw new Error(`Unexpected type ${type}`);
+    default:
+      throw new Error(`Unexpected type ${type}`);
   }
 
   delete vdom.el;
@@ -27,7 +28,7 @@ function removeTextNode(v) {
   const { el: element } = v;
   element.remove();
 }
-function removeElementNode(v){
+function removeElementNode(v) {
   const { el: element, children, listeners } = v;
 
   element.remove();
@@ -38,8 +39,7 @@ function removeElementNode(v){
     delete v.listeners;
   }
 }
-function removeFragmentNode(v){
+function removeFragmentNode(v) {
   const { children } = v;
   children.forEach(unmount);
 }
-
