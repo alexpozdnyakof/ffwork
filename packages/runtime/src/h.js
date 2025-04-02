@@ -24,9 +24,13 @@ export function hFragment(vNodes) {
 }
 
 export function h(tag, props = {}, children = []) {
+  const { class: classNames, ...rest } = props;
   return {
     tag,
-    props,
+    props: {
+      ...rest,
+      class: Array.isArray(classNames) ? withoutNulls(classNames) : classNames,
+    },
     children: mapTextNodes(withoutNulls(children)),
     type: DOM_TYPES.ELEMENT,
   };
