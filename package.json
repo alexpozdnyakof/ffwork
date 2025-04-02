@@ -6,8 +6,5 @@
   "author": "alexpozdnyakof",
   "license": "MIT",
   "private": true,
-  "workspaces": [
-    "packages/*",
-    "examples/*"
-  ]
+  "workspaces": ["packages/**", "examples/**"]
 }

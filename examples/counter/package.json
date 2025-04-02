@@ -10,7 +10,7 @@
     "serve": "^14.2.4"
   },
   "dependencies": {
-    "runtime": "0.0.1"
+    "@fwork/runtime": "0.0.2"
   },
   "scripts": {
     "start": "serve dist/",
