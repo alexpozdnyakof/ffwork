@@ -17,11 +17,11 @@ import {
 } from "./utils/diff";
 import { isNotBlankOrEmptyString } from "./utils/string";
 
-export function patch(prev, next, root) {
+export function patch(prev, next, root, hostComponent = null) {
   if (!areNodesEqual(prev, next)) {
     const idx = findChildIndex(root, prev.el);
     unmount(prev);
-    mount(next, root, idx);
+    mount(next, root, idx, hostComponent);
 
     return next;
   }
@@ -34,12 +34,12 @@ export function patch(prev, next, root) {
       return next;
     }
     case DOM_TYPES.ELEMENT: {
-      patchElement(prev, next);
+      patchElement(prev, next, hostComponent);
       break;
     }
   }
 
-  patchChildren(prev, next);
+  patchChildren(prev, next, hostComponent);
 
   return next;
 }
@@ -53,7 +53,7 @@ function patchText(prev, next) {
   if (prev.value !== next.value) prev.el.nodeValue = next.value;
 }
 
-function patchElement(prev, next) {
+function patchElement(prev, next, hostComponent) {
   const {
     class: pClass,
     style: pStyle,
@@ -71,7 +71,13 @@ function patchElement(prev, next) {
   patchAttributes(prev.el, pAttributes, nAttributes);
   patchClasses(prev.el, pClass, nClass);
   patchStyles(prev.el, pStyle, nStyle);
-  next.listeners = patchEvents(prev.el, prev.listeners, pEvents, nEvents);
+  next.listeners = patchEvents(
+    prev.el,
+    prev.listeners,
+    pEvents,
+    nEvents,
+    hostComponent
+  );
 }
 
 function patchAttributes(el, prev, next) {
@@ -113,7 +119,13 @@ function patchStyles(el, prev = {}, next = {}) {
   }
 }
 
-function patchEvents(el, prevListeners = {}, prevEvents = {}, nextEvents = {}) {
+function patchEvents(
+  el,
+  prevListeners = {},
+  prevEvents = {},
+  nextEvents = {},
+  hostComponent
+) {
   const { removed, added, updated } = objectDiff(prevEvents, nextEvents);
 
   for (const eventName of removed.concat(updated)) {
@@ -123,24 +135,31 @@ function patchEvents(el, prevListeners = {}, prevEvents = {}, nextEvents = {}) {
   const addedListeners = {};
 
   for (const eventName of added.concat(updated)) {
-    const listener = addEventListener(eventName, nextEvents[eventName], el);
+    const listener = addEventListener(
+      eventName,
+      nextEvents[eventName],
+      el,
+      hostComponent
+    );
     addedListeners[eventName] = listener;
   }
 
   return addedListeners;
 }
 
-function patchChildren(prev, next) {
+function patchChildren(prev, next, host) {
   const prevChildren = extractChildren(prev);
   const nextChildren = extractChildren(next);
   const root = prev.el;
   const diff = arrayDiffSeq(prevChildren, nextChildren, areNodesEqual);
+
   for (const operation of diff) {
     const { originalIndex, index, item, from } = operation;
+    const offset = host ? host.offset : 0;
 
     switch (operation.op) {
       case ARRAY_DIFF_OP.ADD: {
-        mount(item, root, index);
+        mount(item, root, index + offset, host);
         break;
       }
       case ARRAY_DIFF_OP.REMOVE: {
@@ -151,15 +170,20 @@ function patchChildren(prev, next) {
         const prevChild = prevChildren.at(originalIndex);
         const nextChild = nextChildren.at(index);
         const el = prevChild.el;
-        const elAtTargetIndex = root.childNodes[index];
+        const elAtTargetIndex = root.childNodes[index + offset];
 
         root.insertBefore(el, elAtTargetIndex);
-        patch(prevChild, nextChild, root);
+        patch(prevChild, nextChild, root, host);
 
         break;
       }
       case ARRAY_DIFF_OP.NOOP: {
-        patch(prevChildren.at(originalIndex), nextChildren.at(index), root);
+        patch(
+          prevChildren.at(originalIndex),
+          nextChildren.at(index),
+          root,
+          host
+        );
         break;
       }
     }
