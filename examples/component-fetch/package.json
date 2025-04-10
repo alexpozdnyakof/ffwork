@@ -1,0 +1,21 @@
+{
+  "name": "component-fetch",
+  "version": "0.0.1",
+  "description": "fetching data example",
+  "main": "index.js",
+  "author": "alexpozdnyakof",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "rollup": "^4.39.0",
+    "rollup-plugin-copy": "^3.5.0",
+    "serve": "^14.2.4"
+  },
+  "dependencies": {
+    "@fwork/runtime": "0.0.3"
+  },
+  "scripts": {
+    "start": "serve dist/",
+    "build": "rollup -c"
+  }
+}
