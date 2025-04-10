@@ -1,6 +1,6 @@
 {
   "name": "@fwork/runtime",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "framework runtime core",
   "main": "dist/fwork.js",
   "module": "dist/fwork.js",
