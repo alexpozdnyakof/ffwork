@@ -37,6 +37,10 @@ export function patch(prev, next, root, hostComponent = null) {
       patchElement(prev, next, hostComponent);
       break;
     }
+    case DOM_TYPES.COMPONENT: {
+      patchComponent(prev, next);
+      break;
+    }
   }
 
   patchChildren(prev, next, hostComponent);
@@ -99,6 +103,16 @@ function patchClasses(el, prev, next) {
 
   if (removed.length > 0) el.classList.remove(...removed);
   if (added.length > 0) el.classList.add(...added);
+}
+
+function patchComponent(prev, next) {
+  const { component } = prev;
+  const { props } = next;
+
+  component.updateProps(props);
+
+  next.component = component;
+  next.el = component.firstElement;
 }
 
 function toClassList(cls = "") {

@@ -10,6 +10,8 @@ export function mount(vdom, root, idx, hostComponent = null) {
       return createElementNode(vdom, root, idx, hostComponent);
     case DOM_TYPES.FRAGMENT:
       return createFragmentNode(vdom, root, idx, hostComponent);
+    case DOM_TYPES.COMPONENT:
+      return createComponentNode(vdom, root, idx, hostComponent);
     default:
       throw new Error(`Unexpected node type ${vdom.type}`);
   }
@@ -42,6 +44,16 @@ function createElementNode(vdom, root, idx, hostComponent) {
 
   children.forEach((child) => mount(child, element, null, hostComponent));
   insert(element, root, idx);
+}
+
+function createComponentNode(vdom, root, idx, hostComponent) {
+  const Component = vdom.tag;
+  const props = vdom.props;
+  const component = new Component(props);
+
+  component.mount(root, idx);
+  vdom.component = component;
+  vdom.el = component.firstELement;
 }
 
 function addProps(el, props, vdom, hostComponent) {

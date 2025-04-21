@@ -17,6 +17,10 @@ export function unmount(vdom) {
       removeFragmentNode(vdom);
       break;
     }
+    case DOM_TYPES.COMPONENT: {
+      vdom.component.unmount();
+      break;
+    }
     default:
       throw new Error(`Unexpected type ${type}`);
   }

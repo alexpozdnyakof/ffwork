@@ -2,6 +2,7 @@ import { unmount } from "./unmount";
 import { mount } from "./mount";
 import { patch } from "./patch";
 import { DOM_TYPES, extractChildren } from "./h";
+import { compareIt } from "compare-it";
 
 export function defineComponent({ render, state, ...methods }) {
   class Component {
@@ -22,7 +23,13 @@ export function defineComponent({ render, state, ...methods }) {
       }
 
       if (this.#vdom.type === DOM_TYPES.FRAGMENT) {
-        return extractChildren(this.#vdom).map((child) => child.el);
+        return extractChildren(this.#vdom)
+          .map((child) => child.el)
+          .flatMap((child) =>
+            child.type === DOM_TYPES.COMPONENT
+              ? child.component.elements
+              : [child.el]
+          );
       }
 
       return [this.#vdom.el];
@@ -36,6 +43,14 @@ export function defineComponent({ render, state, ...methods }) {
       return this.#vdom.type === DOM_TYPES.FRAGMENT
         ? Array.from(this.#hostEl.children).indexOf(this.firstElement)
         : 0;
+    }
+
+    updateProps(props) {
+      const next = { ...this.props, ...props };
+      if (!compareIt(next, this.props)) {
+        this.props = next;
+        this.#patch();
+      }
     }
 
     updateState(state) {
