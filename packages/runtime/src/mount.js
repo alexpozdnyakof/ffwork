@@ -1,6 +1,7 @@
 import { DOM_TYPES } from "./h";
 import { setAttributes } from "./attributes";
 import { addEventListeners } from "./events";
+import { extractPropsAndEvents } from "./utils/props";
 
 export function mount(vdom, root, idx, hostComponent = null) {
   switch (vdom.type) {
@@ -48,9 +49,8 @@ function createElementNode(vdom, root, idx, hostComponent) {
 
 function createComponentNode(vdom, root, idx, hostComponent) {
   const Component = vdom.tag;
-  const props = vdom.props;
-  const component = new Component(props);
-
+  const { props, events } = extractPropsAndEvents(vdom);
+  const component = new Component(props, events, hostComponent);
   component.mount(root, idx);
   vdom.component = component;
   vdom.el = component.firstELement;

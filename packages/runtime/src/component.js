@@ -2,6 +2,7 @@ import { unmount } from "./unmount";
 import { mount } from "./mount";
 import { patch } from "./patch";
 import { DOM_TYPES, extractChildren } from "./h";
+import { dispatcher } from "./dispatcher";
 import { compareIt } from "compare-it";
 
 export function defineComponent({ render, state, ...methods }) {
@@ -9,12 +10,18 @@ export function defineComponent({ render, state, ...methods }) {
     #isMounted = false;
     #vdom = null;
     #hostEl = null;
+    #eventHandlers = null;
+    #parentComponent = null;
+    #dispatcher = dispatcher();
+    #subscriptions = [];
     state;
     props;
 
-    constructor(props = {}) {
+    constructor(props = {}, eventHandlers = {}, parentComponent = null) {
       this.props = props;
       this.state = state ? state(props) : {};
+      this.#eventHandlers = eventHandlers;
+      this.#parentComponent = parentComponent;
     }
 
     get elements() {
@@ -23,13 +30,11 @@ export function defineComponent({ render, state, ...methods }) {
       }
 
       if (this.#vdom.type === DOM_TYPES.FRAGMENT) {
-        return extractChildren(this.#vdom)
-          .map((child) => child.el)
-          .flatMap((child) =>
-            child.type === DOM_TYPES.COMPONENT
-              ? child.component.elements
-              : [child.el]
-          );
+        return extractChildren(this.#vdom).flatMap((child) =>
+          child.type === DOM_TYPES.COMPONENT
+            ? child.component.elements
+            : [child.el]
+        );
       }
 
       return [this.#vdom.el];
@@ -43,6 +48,10 @@ export function defineComponent({ render, state, ...methods }) {
       return this.#vdom.type === DOM_TYPES.FRAGMENT
         ? Array.from(this.#hostEl.children).indexOf(this.firstElement)
         : 0;
+    }
+
+    emit(eventName, payload) {
+      this.#dispatcher.dispatch(eventName, payload);
     }
 
     updateProps(props) {
@@ -68,6 +77,7 @@ export function defineComponent({ render, state, ...methods }) {
       }
       this.#vdom = this.render();
       mount(this.#vdom, hostEl, idx, this);
+      this.#wireEventHandlers();
       this.#hostEl = hostEl;
       this.#isMounted = true;
     }
@@ -77,9 +87,11 @@ export function defineComponent({ render, state, ...methods }) {
         throw new Error("Trying unmount not mounted component");
       }
       unmount(this.#vdom);
+      this.#subscriptions.forEach((unsubscribe) => unsubscribe());
       this.#vdom = null;
       this.#hostEl = null;
       this.#isMounted = false;
+      this.#subscriptions = [];
     }
 
     #patch() {
@@ -89,6 +101,21 @@ export function defineComponent({ render, state, ...methods }) {
 
       const next = this.render();
       this.#vdom = patch(this.#vdom, next, this.#hostEl, this);
+    }
+    #wireEventHandlers() {
+      this.#subscriptions = Object.entries(this.#eventHandlers).map(
+        ([name, handler]) => this.#wireEventHandler(name, handler)
+      );
+    }
+
+    #wireEventHandler(eventName, handler) {
+      return this.#dispatcher.subscribe(eventName, (payload) => {
+        if (this.#parentComponent) {
+          handler.call(this.#parentComponent, payload);
+        } else {
+          handler(payload);
+        }
+      });
     }
   }
 

@@ -16,6 +16,7 @@ import {
   ARRAY_DIFF_OP,
 } from "./utils/diff";
 import { isNotBlankOrEmptyString } from "./utils/string";
+import { extractPropsAndEvents } from "./utils/props";
 
 export function patch(prev, next, root, hostComponent = null) {
   if (!areNodesEqual(prev, next)) {
@@ -107,7 +108,7 @@ function patchClasses(el, prev, next) {
 
 function patchComponent(prev, next) {
   const { component } = prev;
-  const { props } = next;
+  const { props } = extractPropsAndEvents(next);
 
   component.updateProps(props);
 
