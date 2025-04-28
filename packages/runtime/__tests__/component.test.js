@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { defineComponent } from "../src/component";
-import { h } from "../src/h";
+import { h, hFragment } from "../src/h";
 
 beforeEach(() => {
   document.body.innerHTML = "";
@@ -173,4 +173,91 @@ describe("component", () => {
     count.updateProps({ count: 1 });
     expect(document.body.innerHTML).toBe("<div>1</div>");
   });
+
+  it("should emit custom event through dom dispatch event", () => {
+    const fn = vi.fn();
+    const button = new ButtonUnderTest(
+      { text: "increment" },
+      { increment: fn }
+    );
+    button.mount(document.body);
+
+    document.querySelector("button").dispatchEvent(new Event("click"));
+
+    expect(fn).toHaveBeenCalledTimes(1);
+    expect(fn).toHaveBeenCalledWith("increment");
+  });
+
+  it("should emit custom event through own emit", () => {
+    const fn = vi.fn();
+    const button = new ButtonUnderTest(
+      { text: "increment" },
+      { increment: fn }
+    );
+    button.mount(document.body);
+    button.emit("increment", 0);
+
+    expect(fn).toHaveBeenCalledTimes(1);
+    expect(fn).toHaveBeenCalledWith(0);
+  });
+
+  it("should not emit custom event before mounting", () => {
+    const fn = vi.fn();
+    const button = new ButtonUnderTest(
+      { text: "increment" },
+      { increment: fn }
+    );
+    button.emit("increment");
+
+    expect(fn).not.toHaveBeenCalled();
+  });
+
+  it("should not emit custom event after unmounting", () => {
+    const fn = vi.fn();
+    const button = new ButtonUnderTest(
+      { text: "increment" },
+      { increment: fn }
+    );
+    button.mount(document.body);
+    button.unmount();
+
+    button.emit("increment");
+
+    expect(fn).not.toHaveBeenCalled();
+  });
+  it("should update state in root component from subcomponents events", () => {
+    const Counter = defineComponent({
+      state() {
+        return { count: 0 };
+      },
+      render() {
+        return hFragment([
+          h("div", {}, [`${this.state.count}`]),
+          h(ButtonUnderTest, {
+            text: "+",
+            on: {
+              increment: () =>
+                this.updateState({ count: this.state.count + 1 }),
+            },
+          }),
+        ]);
+      },
+    });
+    const counter = new Counter();
+    counter.mount(document.body);
+    expect(document.body.innerHTML).toBe("<div>0</div><button>+</button>");
+
+    document.querySelector("button").dispatchEvent(new Event("click"));
+    expect(document.body.innerHTML).toBe("<div>1</div><button>+</button>");
+  });
+});
+
+const ButtonUnderTest = defineComponent({
+  render() {
+    return h(
+      "button",
+      { on: { click: () => this.emit("increment", this.props.text) } },
+      [this.props.text]
+    );
+  },
 });
