@@ -37,10 +37,10 @@ function createFragmentNode(vdom, root, idx, hostComponent) {
 }
 
 function createElementNode(vdom, root, idx, hostComponent) {
-  const { tag, props, children } = vdom;
+  const { tag, children } = vdom;
 
   const element = document.createElement(tag);
-  addProps(element, props, vdom, hostComponent);
+  addProps(element, vdom, hostComponent);
   vdom.el = element;
 
   children.forEach((child) => mount(child, element, null, hostComponent));
@@ -56,11 +56,11 @@ function createComponentNode(vdom, root, idx, hostComponent) {
   vdom.el = component.firstELement;
 }
 
-function addProps(el, props, vdom, hostComponent) {
-  const { on: events, ...attrs } = props;
+function addProps(el, vdom, hostComponent) {
+  const { props, events } = extractPropsAndEvents(vdom);
 
   vdom.listeners = addEventListeners(events, el, hostComponent);
-  setAttributes(el, attrs);
+  setAttributes(el, props);
 }
 
 function insert(el, root, idx) {
