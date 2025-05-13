@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { defineComponent } from "../src/component";
-import { h, hFragment } from "../src/h";
+import { h, hString, hFragment } from "../src/h";
 
 beforeEach(() => {
   document.body.innerHTML = "";
@@ -250,6 +250,32 @@ describe("component", () => {
     document.querySelector("button").dispatchEvent(new Event("click"));
     expect(document.body.innerHTML).toBe("<div>1</div><button>+</button>");
   });
+  it("should persist components state after removing one from list", () => {
+    const counterApp = new CounterApp();
+    counterApp.mount(document.body);
+
+    expect(document.body.innerHTML).toBe(
+      `<div class="container"><div><button>1</button><button>remove</button></div><div><button>1</button><button>remove</button></div><div><button>1</button><button>remove</button></div></div>`
+    );
+
+    const container = document.querySelector(".container");
+
+    const secondCounter = container.children[1];
+    const thirdCounter = container.children[2];
+
+    secondCounter.querySelectorAll("button").item(0).click();
+    thirdCounter.querySelectorAll("button").item(0).click();
+    thirdCounter.querySelectorAll("button").item(0).click();
+
+    expect(document.body.innerHTML).toBe(
+      `<div class="container"><div><button>1</button><button>remove</button></div><div><button>2</button><button>remove</button></div><div><button>3</button><button>remove</button></div></div>`
+    );
+
+    secondCounter.querySelectorAll("button").item(1).click();
+    expect(document.body.innerHTML).toBe(
+      `<div class="container"><div><button>1</button><button>remove</button></div><div><button>3</button><button>remove</button></div></div>`
+    );
+  });
 });
 
 const ButtonUnderTest = defineComponent({
@@ -258,6 +284,51 @@ const ButtonUnderTest = defineComponent({
       "button",
       { on: { click: () => this.emit("increment", this.props.text) } },
       [this.props.text]
+    );
+  },
+});
+
+const Counter = defineComponent({
+  state() {
+    return { count: 1 };
+  },
+  render() {
+    let { count } = this.state;
+
+    return h("div", {}, [
+      h(
+        "button",
+        { on: { click: () => this.updateState({ count: count + 1 }) } },
+        [hString(count)]
+      ),
+      h("button", { on: { click: () => this.emit("remove") } }, ["remove"]),
+    ]);
+  },
+});
+
+const CounterApp = defineComponent({
+  state() {
+    return {
+      counters: [{ id: 1 }, { id: 2 }, { id: 3 }],
+    };
+  },
+  render() {
+    let { counters } = this.state;
+
+    return h(
+      "div",
+      { className: "container" },
+      counters.map((counter) =>
+        h(Counter, {
+          key: counter.id,
+          on: {
+            remove: () =>
+              this.updateState({
+                counters: counters.filter(({ id }) => id !== counter.id),
+              }),
+          },
+        })
+      )
     );
   },
 });
