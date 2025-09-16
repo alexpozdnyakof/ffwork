@@ -2,6 +2,7 @@ import { DOM_TYPES } from "./h";
 import { setAttributes } from "./attributes";
 import { addEventListeners } from "./events";
 import { extractPropsAndEvents } from "./utils/props";
+import { enqueueJob } from "./scheduler";
 
 export function mount(vdom, root, idx, hostComponent = null) {
   switch (vdom.type) {
@@ -11,8 +12,11 @@ export function mount(vdom, root, idx, hostComponent = null) {
       return createElementNode(vdom, root, idx, hostComponent);
     case DOM_TYPES.FRAGMENT:
       return createFragmentNode(vdom, root, idx, hostComponent);
-    case DOM_TYPES.COMPONENT:
-      return createComponentNode(vdom, root, idx, hostComponent);
+    case DOM_TYPES.COMPONENT: {
+      createComponentNode(vdom, root, idx, hostComponent);
+      enqueueJob(() => vdom.component.onMounted());
+      break;
+    }
     default:
       throw new Error(`Unexpected node type ${vdom.type}`);
   }
@@ -48,9 +52,11 @@ function createElementNode(vdom, root, idx, hostComponent) {
 }
 
 function createComponentNode(vdom, root, idx, hostComponent) {
-  const Component = vdom.tag;
+  const { tag: Component, children } = vdom;
   const { props, events } = extractPropsAndEvents(vdom);
   const component = new Component(props, events, hostComponent);
+  component.setExternalContent(children);
+
   component.mount(root, idx);
   vdom.component = component;
   vdom.el = component.firstELement;

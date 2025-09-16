@@ -1,3 +1,4 @@
 export { createApp } from "./create-app";
-export { h, hString, hFragment } from "./h";
+export { DOM_TYPES, h, hString, hFragment, hSlot } from "./h";
 export { defineComponent } from "./component";
+export { nextTick } from "./scheduler";

@@ -1,11 +1,24 @@
 import { unmount } from "./unmount";
 import { mount } from "./mount";
 import { patch } from "./patch";
-import { DOM_TYPES, extractChildren } from "./h";
+import {
+  DOM_TYPES,
+  didCreateSlot,
+  extractChildren,
+  resetDidCreateSlot,
+} from "./h";
 import { dispatcher } from "./dispatcher";
+import { fillSlots } from "./slots";
 import { compareIt } from "compare-it";
+const noop = () => {};
 
-export function defineComponent({ render, state, ...methods }) {
+export function defineComponent({
+  render,
+  state,
+  onMounted = noop,
+  onUnmounted = noop,
+  ...methods
+}) {
   class Component {
     #isMounted = false;
     #vdom = null;
@@ -14,6 +27,7 @@ export function defineComponent({ render, state, ...methods }) {
     #parentComponent = null;
     #dispatcher = dispatcher();
     #subscriptions = [];
+    #children = [];
     state;
     props;
 
@@ -22,6 +36,20 @@ export function defineComponent({ render, state, ...methods }) {
       this.state = state ? state(props) : {};
       this.#eventHandlers = eventHandlers;
       this.#parentComponent = parentComponent;
+    }
+
+    setExternalContent(children) {
+      this.#children = children;
+    }
+
+    onMounted() {
+      console.log("mount", onMounted.toString());
+      return Promise.resolve(onMounted.call(this));
+    }
+
+    onUnmounted() {
+      console.log("unmount", onUnmounted.toString());
+      return Promise.resolve(onUnmounted.call(this));
     }
 
     get elements() {
@@ -68,7 +96,13 @@ export function defineComponent({ render, state, ...methods }) {
     }
 
     render() {
-      return render.call(this);
+      const vdom = render.call(this);
+      if (didCreateSlot()) {
+        fillSlots(vdom, this.#children);
+        resetDidCreateSlot();
+      }
+
+      return vdom;
     }
 
     mount(hostEl, idx = null) {

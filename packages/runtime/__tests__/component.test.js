@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
 import { defineComponent } from "../src/component";
 import { h, hString, hFragment } from "../src/h";
-
+import { mount } from "../src/mount";
+import { nextTick } from "../src/scheduler";
 beforeEach(() => {
   document.body.innerHTML = "";
 });
@@ -250,6 +251,7 @@ describe("component", () => {
     document.querySelector("button").dispatchEvent(new Event("click"));
     expect(document.body.innerHTML).toBe("<div>1</div><button>+</button>");
   });
+
   it("should persist components state after removing one from list", () => {
     const counterApp = new CounterApp();
     counterApp.mount(document.body);
@@ -275,6 +277,46 @@ describe("component", () => {
     expect(document.body.innerHTML).toBe(
       `<div class="container"><div><button>1</button><button>remove</button></div><div><button>3</button><button>remove</button></div></div>`
     );
+  });
+
+  describe("Hooks", async () => {
+    it("should run passed function on mount", async () => {
+      const fn = vi.fn();
+      const WithOnMount = defineComponent({
+        render() {
+          const { text } = this.state;
+          return h("button", {}, [text ?? "submit"]);
+        },
+        onMounted() {
+          fn();
+        },
+      });
+
+      mount(h(WithOnMount, {}), document.body);
+      await nextTick();
+      expect(fn).toHaveBeenCalled();
+      expect(fn).toHaveBeenCalledTimes(1);
+    });
+
+    it("should run passed function on unmount", async () => {
+      const fn = vi.fn();
+      const Component = defineComponent({
+        render() {
+          const { text } = this.state;
+          return h("button", {}, [text ?? "submit"]);
+        },
+        onUnmounted() {
+          fn();
+        },
+      });
+
+      const component = new Component();
+      component.mount(document.body);
+      await component.unmount();
+      await nextTick();
+      expect(fn).toHaveBeenCalled();
+      expect(fn).toHaveBeenCalledTimes(1);
+    });
   });
 });
 

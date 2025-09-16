@@ -108,8 +108,10 @@ function patchClasses(el, prev, next) {
 
 function patchComponent(prev, next) {
   const { component } = prev;
+  const { children } = next;
   const { props } = extractPropsAndEvents(next);
 
+  component.setExternalContent(children);
   component.updateProps(props);
 
   next.component = component;

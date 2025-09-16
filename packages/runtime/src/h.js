@@ -5,12 +5,28 @@ export const DOM_TYPES = {
   ELEMENT: "element",
   FRAGMENT: "fragment",
   COMPONENT: "component",
+  SLOT: "slot",
 };
 
 function mapTextNodes(children) {
   return children.map((child) =>
     typeof child === "string" ? hString(child) : child
   );
+}
+
+/** SLOT SUPPORT WITH TRAVERSING OPTIMIZATION **/
+let hSlotCalled = false;
+
+export function didCreateSlot() {
+  return hSlotCalled;
+}
+export function resetDidCreateSlot() {
+  hSlotCalled = false;
+}
+
+export function hSlot(children = []) {
+  hSlotCalled = true;
+  return { types: DOM_TYPES.SLOT, children };
 }
 
 export function hString(str) {
