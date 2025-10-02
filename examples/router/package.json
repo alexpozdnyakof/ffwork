@@ -1,0 +1,22 @@
+{
+  "name": "router",
+  "version": "0.0.1",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "rollup": "^4.31.0",
+    "rollup-plugin-copy": "^3.5.0",
+    "serve": "^14.2.4"
+  },
+  "dependencies": {
+    "@fwork/runtime": "1.0.0",
+    "@fwork/router": "1.0.0",
+    "@fwork/router-adapter": "1.0.0"
+  },
+  "scripts": {
+    "start": "serve dist/",
+    "build": "rollup -c",
+    "build:watch": "rollup -c --watch"
+  }
+}

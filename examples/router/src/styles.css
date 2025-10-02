@@ -1,0 +1,6 @@
+.counter__container {
+  display: flex;
+  gap: .5em;
+  align-items: center;
+}
+
