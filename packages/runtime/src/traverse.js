@@ -10,7 +10,7 @@ export function traverseDeepFirstSearch(
 
   if (vdom.children) {
     vdom.children.forEach((child, i) =>
-      traverseDeep(child, processNode, shouldSkipBranch, vdom, i)
+      traverseDeepFirstSearch(child, processNode, shouldSkipBranch, vdom, i)
     );
   }
 }

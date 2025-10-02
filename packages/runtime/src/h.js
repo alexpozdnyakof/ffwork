@@ -26,7 +26,7 @@ export function resetDidCreateSlot() {
 
 export function hSlot(children = []) {
   hSlotCalled = true;
-  return { types: DOM_TYPES.SLOT, children };
+  return { type: DOM_TYPES.SLOT, children };
 }
 
 export function hString(str) {

@@ -1,0 +1,26 @@
+{
+  "name": "@fwork/dispatcher",
+  "version": "1.0.0",
+  "description": "dispatcher",
+  "module": "dist/index.mjs",
+  "main": "dist/index.js",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "author": "alexpozdnyakof",
+  "license": "MIT",
+  "scripts": {
+    "prepack": "yarn run build",
+    "build:dev": "NODE_ENV=development rollup --config-package dispatcher --bundleConfigAsCjs -c ../../rollup.config.mjs",
+    "build:watch": "NODE_ENV=development rollup --config-package dispatcher  --bundleConfigAsCjs -c ../../rollup.config.mjs --watch",
+    "build": "NODE_ENV=production rollup --config-package dispatcher --bundleConfigAsCjs -c ../../rollup.config.mjs",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "test": "vitest --reporter=verbose",
+    "test:run": "vitest run"
+  }
+}
