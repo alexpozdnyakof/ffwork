@@ -7,7 +7,7 @@ import {
   extractChildren,
   resetDidCreateSlot,
 } from "./h";
-import { dispatcher } from "./dispatcher";
+import { dispatcher } from "@fwork/dispatcher";
 import { fillSlots } from "./slots";
 import { compareIt } from "compare-it";
 const noop = () => {};
@@ -27,6 +27,7 @@ export function defineComponent({
     #parentComponent = null;
     #dispatcher = dispatcher();
     #subscriptions = [];
+    #appContext = null;
     #children = [];
     state;
     props;
@@ -47,6 +48,12 @@ export function defineComponent({
       return Promise.resolve(onMounted.call(this));
     }
 
+    setAppContext(newContext) {
+      this.#appContext = newContext;
+    }
+    get appContext() {
+      return this.#appContext;
+    }
     onUnmounted() {
       console.log("unmount", onUnmounted.toString());
       return Promise.resolve(onUnmounted.call(this));
