@@ -1,0 +1,30 @@
+{
+  "name": "@fwork/router",
+  "version": "1.0.0",
+  "description": "router",
+  "module": "dist/index.mjs",
+  "main": "dist/index.js",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "author": "alexpozdnyakof",
+
+  "license": "MIT",
+  "dependencies": {
+    "@fwork/dispatcher": "1.0.0"
+  },
+  "scripts": {
+    "prepack": "yarn run build",
+    "build:dev": "NODE_ENV=development rollup --config-package router --bundleConfigAsCjs -c ../../rollup.config.mjs",
+    "build:watch": "NODE_ENV=development rollup --config-package router --bundleConfigAsCjs -c ../../rollup.config.mjs --watch",
+    "build": "NODE_ENV=production rollup --config-package router --bundleConfigAsCjs -c ../../rollup.config.mjs",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "test": "vitest --reporter=verbose",
+    "test:run": "vitest run"
+  }
+}
