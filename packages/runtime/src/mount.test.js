@@ -1,7 +1,7 @@
 import { expect, test, beforeEach, vi } from "vitest";
-import { mount } from "../src/mount";
-import { unmount } from "../src/unmount";
-import { h, hString, hFragment } from "../src/h";
+import { mount } from "./mount";
+import { unmount } from "./unmount";
+import { h, hString, hFragment } from "./h";
 
 beforeEach(() => {
   vi.unstubAllGlobals();

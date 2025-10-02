@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { h, hFragment } from "../src/h";
+import { h, hFragment } from "./h";
 
 test("should create element", () => {
   expect(h("div")).toEqual({

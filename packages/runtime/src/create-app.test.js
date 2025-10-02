@@ -1,7 +1,7 @@
 import { expect, test, afterEach, beforeEach, vi } from "vitest";
-import { createApp } from "../src/create-app";
-import { h, hString } from "../src/h";
-import { defineComponent } from "../src/component";
+import { createApp } from "./create-app";
+import { h, hString } from "./h";
+import { defineComponent } from "./component";
 let app;
 
 beforeEach(() => {

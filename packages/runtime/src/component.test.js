@@ -1,8 +1,9 @@
-import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
-import { defineComponent } from "../src/component";
-import { h, hString, hFragment } from "../src/h";
-import { mount } from "../src/mount";
-import { nextTick } from "../src/scheduler";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { defineComponent } from "./component";
+import { h, hString, hFragment } from "./h";
+import { mount } from "./mount";
+import { nextTick } from "./scheduler";
+
 beforeEach(() => {
   document.body.innerHTML = "";
 });

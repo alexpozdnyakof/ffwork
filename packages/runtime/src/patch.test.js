@@ -1,12 +1,9 @@
-import { afterEach, beforeEach, expect, describe, it, test, vi } from "vitest";
-import { h, hFragment, hString } from "../src/h";
-import { patch } from "../src/patch";
-import { mount } from "../src/mount";
+import { beforeEach, expect, describe, it, test, vi } from "vitest";
+import { h, hFragment, hString } from "./h";
+import { patch } from "./patch";
+import { mount } from "./mount";
 
 function patchAfterMount(prev, next) {
-  /*return Promise.resolve(mount(prev, document.body)).then(() =>
-    patch(prev, next)
-  );*/
   mount(prev, document.body);
   return patch(prev, next, document.body);
 }

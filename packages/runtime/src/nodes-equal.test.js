@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
-import { h, hString, hFragment } from "../src/h";
-import { areNodesEqual } from "../src/nodes-equal";
+import { h, hString, hFragment } from "./h";
+import { areNodesEqual } from "./nodes-equal";
 
 test("should return false for element and text node", () => {
   expect(areNodesEqual(h("button"), hString("text"))).toBeFalsy();
